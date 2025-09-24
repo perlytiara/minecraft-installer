@@ -83,7 +83,7 @@ jobs:
       run: cargo build --release --target ${{ matrix.target }}
 
     - name: Run tests
-      run: cargo test --target ${{ matrix.target }}
+      run: cargo test --lib --target ${{ matrix.target }}
 
     - name: Strip binary (Linux/macOS)
       if: matrix.os != 'windows-latest'
