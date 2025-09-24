@@ -118,13 +118,14 @@ jobs:
     - name: Create checksums
       run: |
         cd artifacts
-        for file in *; do
-          if [[ "$file" == *.exe ]]; then
+        find . -type f -name "minecraft-installer*" | while read -r file; do
+          filename=$(basename "$file")
+          if [[ "$filename" == *.exe ]]; then
             # Windows - use certutil for checksums
-            certutil -hashfile "$file" SHA256 > "${file}.sha256"
+            certutil -hashfile "$file" SHA256 > "${filename}.sha256"
           else
             # Linux/macOS - use shasum
-            shasum -a 256 "$file" > "${file}.sha256"
+            shasum -a 256 "$file" > "${filename}.sha256"
           fi
         done
 
@@ -191,6 +192,7 @@ jobs:
         name: Minecraft Installer ${{ steps.get_version.outputs.VERSION }}
         body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
         files: |
-          artifacts/*
+          artifacts/**/minecraft-installer*
+          artifacts/**/*.sha256
         draft: false
         prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
