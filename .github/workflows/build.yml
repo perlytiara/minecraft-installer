@@ -120,13 +120,8 @@ jobs:
         cd artifacts
         find . -type f -name "minecraft-installer*" | while read -r file; do
           filename=$(basename "$file")
-          if [[ "$filename" == *.exe ]]; then
-            # Windows - use certutil for checksums
-            certutil -hashfile "$file" SHA256 > "${filename}.sha256"
-          else
-            # Linux/macOS - use shasum
-            shasum -a 256 "$file" > "${filename}.sha256"
-          fi
+          # Use shasum for all files (works on Linux/macOS, and we're on Ubuntu)
+          shasum -a 256 "$file" > "${filename}.sha256"
         done
 
     - name: Create release notes
