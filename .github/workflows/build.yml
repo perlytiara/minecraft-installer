@@ -187,13 +187,13 @@ jobs:
           cat release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-          tag_name: ${{ github.ref_name }}
-          name: Minecraft Installer ${{ steps.get_version.outputs.VERSION }}
-          body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        token: ${{ secrets.GH_TOKEN }}
+        tag_name: ${{ github.ref_name }}
+        name: Minecraft Installer ${{ steps.get_version.outputs.VERSION }}
+        body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
         files: |
           artifacts/**/minecraft-installer*
           artifacts/**/*.sha256
