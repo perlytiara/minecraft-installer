@@ -19,3 +19,4 @@ mkdir -p dist
 cp target/x86_64-unknown-linux-gnu/release/minecraft-installer dist/minecraft-installer-linux-x86_64
 
 echo "✓ Linux build complete: dist/minecraft-installer-linux-x86_64"
+

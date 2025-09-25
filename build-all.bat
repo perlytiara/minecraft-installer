@@ -35,3 +35,4 @@ copy target\aarch64-apple-darwin\release\minecraft-installer dist\minecraft-inst
 echo All builds completed successfully!
 echo Output files:
 dir dist
+

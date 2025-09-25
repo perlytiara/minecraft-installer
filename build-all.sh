@@ -38,3 +38,4 @@ cp target/aarch64-apple-darwin/release/minecraft-installer dist/minecraft-instal
 echo "All builds completed successfully!"
 echo "Output files:"
 ls -la dist/
+

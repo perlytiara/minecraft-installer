@@ -17,3 +17,4 @@ COPY . .
 RUN cargo build --release --target x86_64-unknown-linux-gnu
 
 # The built binary will be in target/x86_64-unknown-linux-gnu/release/minecraft-installer
+

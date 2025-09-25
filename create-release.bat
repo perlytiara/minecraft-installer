@@ -57,3 +57,4 @@ echo 📦 Once complete, download from:
 echo    https://github.com/perlytiara/minecraft-installer/releases/tag/v%VERSION%
 
 pause
+

@@ -21,3 +21,4 @@ echo 1. Restart your terminal
 echo 2. Install MinGW-w64: pacman -S mingw-w64-x86_64-toolchain
 echo 3. Set up WSL2 with Ubuntu
 echo 4. Run build-all.bat again
+

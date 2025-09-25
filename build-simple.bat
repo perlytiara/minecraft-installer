@@ -29,3 +29,4 @@ echo - For Windows GNU: Install MinGW-w64 toolchain
 echo.
 echo Output files:
 dir dist
+

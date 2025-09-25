@@ -97,3 +97,4 @@ The Windows build produces:
 - `minecraft-installer-windows-x86_64.exe` (10.4 MB)
 - Supports all launcher types including the new "Other" custom path launcher
 - Includes all features: mrpack installation, API downloads, automodpack setup
+
