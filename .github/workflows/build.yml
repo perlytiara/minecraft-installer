@@ -71,19 +71,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pkg-config libssl-dev
 
-      - name: Install dependencies (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew install openssl
-          export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
-          export OPENSSL_LIB_DIR=$(brew --prefix openssl)/lib
-          export OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)/include
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install openssl
+        export OPENSSL_ROOT_DIR=$(brew --prefix openssl)
+        export OPENSSL_LIB_DIR=$(brew --prefix openssl)/lib
+        export OPENSSL_INCLUDE_DIR=$(brew --prefix openssl)/include
 
-      - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+    - name: Build
+      run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Run tests
-        run: cargo test --lib --target ${{ matrix.target }}
+    - name: Run tests
+      run: cargo test --lib --target ${{ matrix.target }}
 
     - name: Strip binary (Linux/macOS)
       if: matrix.os != 'windows-latest'
@@ -115,70 +115,70 @@ jobs:
         with:
           path: ./artifacts
 
-      - name: Create checksums
-        run: |
-          cd artifacts
-          find . -type f -name "minecraft-installer*" | while read -r file; do
-            filename=$(basename "$file")
-            # Use shasum for all files (works on Linux/macOS, and we're on Ubuntu)
-            shasum -a 256 "$file" > "${filename}.sha256"
-          done
+    - name: Create checksums
+      run: |
+        cd artifacts
+        find . -type f -name "minecraft-installer*" | while read -r file; do
+          filename=$(basename "$file")
+          # Use shasum for all files (works on Linux/macOS, and we're on Ubuntu)
+          shasum -a 256 "$file" > "${filename}.sha256"
+        done
 
-      - name: Create release notes
-        id: release_notes
-        run: |
-          cat > release_notes.md << EOF
-          # Minecraft Installer ${{ steps.get_version.outputs.VERSION }}
-
-          ## 🎉 New Release
-
-          This release includes builds for all major platforms:
-
-          ### 📦 Downloads
-
-          **Windows:**
-          - \`minecraft-installer-windows-x86_64.exe\` - Windows x64 (MSVC)
-          - \`minecraft-installer-windows-gnu-x86_64.exe\` - Windows x64 (GNU)
-
-          **Linux:**
-          - \`minecraft-installer-linux-x86_64\` - Linux x64
-
-          **macOS:**
-          - \`minecraft-installer-macos-intel-x86_64\` - macOS Intel
-          - \`minecraft-installer-macos-apple-silicon-aarch64\` - macOS Apple Silicon
-
-          ### ✨ Features
-
-          - **Multi-Launcher Support**: AstralRinth, ModrinthApp, XMCL, PrismLauncher, Official Minecraft, MultiMC
-          - **Custom Path Installation**: Install directly to any directory (perfect for Legacy Launcher)
-          - **API Integration**: Download modpacks from NAHA API
-          - **Automodpack Setup**: Automatic server configuration
-
-          ### 🚀 Quick Start
-
-          \`\`\`bash
-          # Install from mrpack file
-          ./minecraft-installer --mrpack "modpack.mrpack" --create-instance
-
-          # Install to custom path
-          ./minecraft-installer --mrpack "modpack.mrpack" --target-launcher other --custom-path "/path/to/install" --create-instance
-
-          # Download from API
-          ./minecraft-installer --download-neoforge --create-instance
-          \`\`\`
-
-          ### 📋 Checksums
-
-          All files include SHA256 checksums for verification.
-
-          ---
-
-          **Full Changelog**: https://github.com/perlytiara/minecraft-installer/compare/${{ github.event.before }}...${{ github.ref_name }}
-          EOF
-
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
-          cat release_notes.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+    - name: Create release notes
+      id: release_notes
+      run: |
+        cat > release_notes.md << 'EOF'
+        # Minecraft Installer ${{ steps.get_version.outputs.VERSION }}
+        
+        ## 🎉 New Release
+        
+        This release includes builds for all major platforms:
+        
+        ### 📦 Downloads
+        
+        **Windows:**
+        - `minecraft-installer-windows-x86_64.exe` - Windows x64 (MSVC)
+        - `minecraft-installer-windows-gnu-x86_64.exe` - Windows x64 (GNU)
+        
+        **Linux:**
+        - `minecraft-installer-linux-x86_64` - Linux x64
+        
+        **macOS:**
+        - `minecraft-installer-macos-intel-x86_64` - macOS Intel
+        - `minecraft-installer-macos-apple-silicon-aarch64` - macOS Apple Silicon
+        
+        ### ✨ Features
+        
+        - **Multi-Launcher Support**: AstralRinth, ModrinthApp, XMCL, PrismLauncher, Official Minecraft, MultiMC
+        - **Custom Path Installation**: Install directly to any directory (perfect for Legacy Launcher)
+        - **API Integration**: Download modpacks from NAHA API
+        - **Automodpack Setup**: Automatic server configuration
+        
+        ### 🚀 Quick Start
+        
+        ```bash
+        # Install from mrpack file
+        ./minecraft-installer --mrpack "modpack.mrpack" --create-instance
+        
+        # Install to custom path
+        ./minecraft-installer --mrpack "modpack.mrpack" --target-launcher other --custom-path "/path/to/install" --create-instance
+        
+        # Download from API
+        ./minecraft-installer --download-neoforge --create-instance
+        ```
+        
+        ### 📋 Checksums
+        
+        All files include SHA256 checksums for verification.
+        
+        ---
+        
+        **Full Changelog**: https://github.com/perlytiara/minecraft-installer/compare/${{ github.event.before }}...${{ github.ref_name }}
+        EOF
+        
+        echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+        cat release_notes.md >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
 
     - name: Create Release
       uses: softprops/action-gh-release@v1
