@@ -115,23 +115,31 @@ jobs:
         with:
           path: ./artifacts
 
-      - name: Create checksums
+      - name: Create checksums and flatten structure
         run: |
           cd artifacts
           echo "Current directory structure:"
           find . -type f -name "minecraft-installer*" | head -10
-          echo "Creating checksums..."
+          echo "Creating checksums and flattening structure..."
+
+          # Create a flat directory for uploads
+          mkdir -p ../upload
+
           find . -type f -name "minecraft-installer*" | while read -r file; do
             filename=$(basename "$file")
             dirname=$(dirname "$file")
-            # Use shasum for all files (works on Linux/macOS, and we're on Ubuntu)
-            shasum -a 256 "$file" > "${dirname}/${filename}.sha256"
-            echo "Created checksum: ${dirname}/${filename}.sha256"
+
+            # Copy the binary to upload directory
+            cp "$file" "../upload/$filename"
+            echo "Copied: $file -> ../upload/$filename"
+
+            # Create checksum in upload directory
+            shasum -a 256 "$file" > "../upload/${filename}.sha256"
+            echo "Created checksum: ../upload/${filename}.sha256"
           done
-          echo "All files in artifacts directory:"
-          find . -type f | sort
-          echo "All checksum files:"
-          find . -name "*.sha256" -type f | sort
+
+          echo "All files in upload directory:"
+          find ../upload -type f | sort
 
       - name: Create release notes
         id: release_notes
@@ -197,7 +205,6 @@ jobs:
           name: Minecraft Installer ${{ steps.get_version.outputs.VERSION }}
           body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
           files: |
-            artifacts/**/minecraft-installer*
-            artifacts/**/*.sha256
+            upload/*
           draft: false
           prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
