@@ -129,13 +129,16 @@ jobs:
             filename=$(basename "$file")
             dirname=$(dirname "$file")
 
-            # Copy the binary to upload directory
-            cp "$file" "../upload/$filename"
-            echo "Copied: $file -> ../upload/$filename"
+            # Use the directory name as the platform identifier to avoid conflicts
+            platform_name=$(basename "$dirname")
+
+            # Copy the binary to upload directory with platform-specific name
+            cp "$file" "../upload/$platform_name"
+            echo "Copied: $file -> ../upload/$platform_name"
 
             # Create checksum in upload directory
-            shasum -a 256 "$file" > "../upload/${filename}.sha256"
-            echo "Created checksum: ../upload/${filename}.sha256"
+            shasum -a 256 "$file" > "../upload/${platform_name}.sha256"
+            echo "Created checksum: ../upload/${platform_name}.sha256"
           done
 
           echo "All files in upload directory:"
