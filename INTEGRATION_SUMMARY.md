@@ -66,16 +66,19 @@ git push origin v1.0.0
 Each release produces **10 binaries** + **10 checksums** = **20 files total**:
 
 ### Windows (4 files)
+
 - `minecraft-installer-windows-x86_64.exe` (MSVC)
 - `minecraft-updater-windows-x86_64.exe` (MSVC)
 - `minecraft-installer-windows-gnu-x86_64.exe` (GNU)
 - `minecraft-updater-windows-gnu-x86_64.exe` (GNU)
 
 ### Linux (2 files)
+
 - `minecraft-installer-linux-x86_64`
 - `minecraft-updater-linux-x86_64`
 
 ### macOS (4 files)
+
 - `minecraft-installer-macos-intel-x86_64`
 - `minecraft-updater-macos-intel-x86_64`
 - `minecraft-installer-macos-apple-silicon-aarch64`
@@ -114,7 +117,7 @@ updater.stdout.on('data', (data) => {
 
 ### Binary Locations in Electron App
 
-```
+```text
 your-electron-app/
 ├── binaries/
 │   ├── win32/
@@ -134,6 +137,7 @@ your-electron-app/
 ## 🚀 Key Features Implemented
 
 ### Intelligent Mod Updating
+
 ✅ Compares mod versions between old and new modpacks  
 ✅ Removes old versions before downloading new ones  
 ✅ Preserves user-added mods (not in modpack)  
@@ -141,17 +145,20 @@ your-electron-app/
 ✅ Deduplicates entries from mrpack files  
 
 ### Database Integration
+
 ✅ Updates AstralRinth `app.db` automatically  
 ✅ Updates ModrinthApp `app.db` automatically  
 ✅ Syncs version info and timestamps  
 ✅ Creates database entries if they don't exist  
 
 ### Version Selection
+
 ✅ Can download/update to latest version  
 ✅ Can specify exact version (e.g., `--version 0.0.18`)  
 ✅ Uses GitHub Releases API for all versions  
 
 ### Launcher Support
+
 ✅ AstralRinth (with database sync)  
 ✅ ModrinthApp (with database sync)  
 ✅ XMCL  
@@ -164,7 +171,7 @@ your-electron-app/
 
 ## 📚 File Structure
 
-```
+```text
 minecraft-installer/
 ├── src/
 │   ├── main.rs                      # minecraft-installer entry point
@@ -194,6 +201,7 @@ minecraft-installer/
 ## 🎓 Important Code Locations
 
 ### Fetching Modpack Info
+
 ```rust
 // launcher_support.rs
 pub async fn fetch_modpack_info(&self, modpack_type: &str) -> Result<NahaModpackInfo>
@@ -201,6 +209,7 @@ pub async fn fetch_modpack_info_version(&self, modpack_type: &str, target_versio
 ```
 
 ### Updating Mods
+
 ```rust
 // updater.rs
 pub async fn update_instance_mods_version(
@@ -212,12 +221,14 @@ pub async fn update_instance_mods_version(
 ```
 
 ### Database Updates
+
 ```rust
 // updater.rs
 async fn update_launcher_database(&self, instance_path: &Path, modpack_info: &NahaModpackInfo) -> Result<()>
 ```
 
 ### Mod Name Normalization
+
 ```rust
 // updater.rs
 fn normalize_mod_name(&self, name: &str) -> String
@@ -244,7 +255,8 @@ fn normalize_mod_name(&self, name: &str) -> String
 ### GitHub API Integration
 
 **Endpoints Used:**
-```
+
+```text
 GET https://api.github.com/repos/perlytiara/NAHA-Minecraft-Modpacks/releases/latest
 GET https://api.github.com/repos/perlytiara/NAHA-Minecraft-Modpacks/releases/tags/NeoForge-0.0.18
 ```
@@ -268,6 +280,7 @@ GET https://api.github.com/repos/perlytiara/NAHA-Minecraft-Modpacks/releases/tag
 - `install_stage` (VARCHAR) - Installation status
 
 **Update Query:**
+
 ```sql
 UPDATE profiles 
 SET modified = ?, game_version = ? 
@@ -279,7 +292,8 @@ WHERE path = ?
 ## 🎨 User Experience Flow
 
 ### Install Flow
-```
+
+```text
 User runs: minecraft-installer --download-neoforge --create-instance
 
 1. Fetch modpack info from GitHub API
@@ -296,7 +310,8 @@ User runs: minecraft-installer --download-neoforge --create-instance
 ```
 
 ### Update Flow
-```
+
+```text
 User runs: minecraft-updater interactive --modpack-type neoforge
 
 1. Scan all launchers for instances
@@ -322,6 +337,7 @@ User runs: minecraft-updater interactive --modpack-type neoforge
 ## 🎁 What This Gives You
 
 ### For End Users
+
 - ✅ Easy modpack installation to any launcher
 - ✅ Automatic mod updates without losing custom mods
 - ✅ Support for all major launchers
@@ -329,6 +345,7 @@ User runs: minecraft-updater interactive --modpack-type neoforge
 - ✅ Database stays in sync
 
 ### For Developers/Integrators
+
 - ✅ Two clean executables (installer + updater)
 - ✅ JSON output for easy parsing
 - ✅ Cross-platform binaries ready to distribute
@@ -337,6 +354,7 @@ User runs: minecraft-updater interactive --modpack-type neoforge
 - ✅ Well-documented codebase
 
 ### For DevOps
+
 - ✅ Automated CI/CD pipeline
 - ✅ Multi-platform builds in one click
 - ✅ Checksums for security
@@ -365,25 +383,30 @@ User runs: minecraft-updater interactive --modpack-type neoforge
 ### To Create Your First Release
 
 1. **Test locally:**
+
    ```bash
    cargo build --release
    cargo test
    ```
 
 2. **Create release:**
+
    ```bash
    ./create-release.sh 1.0.0
    ```
 
 3. **Monitor build:**
+
    - Visit: `https://github.com/perlytiara/AstralRinth/actions`
    - Wait 10-15 minutes
 
 4. **Download & test:**
+
    - Visit: `https://github.com/perlytiara/AstralRinth/releases`
    - Download and test one binary
 
 5. **Announce:**
+
    - Share with users
    - Update documentation links
    - Celebrate! 🎉
@@ -573,16 +596,19 @@ module.exports = MinecraftManager
 **Solution Implemented:**
 
 1. **Cargo.toml Configuration:**
+
    - Defined two binary targets: `minecraft-installer` and `minecraft-updater`
    - Both share the same library code (`src/lib.rs`)
 
 2. **GitHub Actions Workflow:**
+
    - Builds both executables for 5 platforms (10 binaries total)
    - Runs tests on all platforms
    - Creates SHA256 checksums
    - Publishes GitHub release with professional notes
 
 3. **Build Scripts:**
+
    - Local: `build.bat` / `build.sh` - Build for current platform
    - Cross: `build-all.bat` / `build-all.sh` - Build for all platforms
    - Release: `create-release.bat` / `create-release.sh` - Tag and trigger CI/CD
@@ -600,4 +626,3 @@ git push origin v1.0.0
 ```
 
 GitHub Actions handles the rest! 🚀
-
