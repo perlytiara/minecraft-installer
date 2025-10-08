@@ -46,9 +46,11 @@ Both binaries share the same library code in `src/lib.rs`.
 ## GitHub Actions CI/CD
 
 ### Workflow File
+
 `.github/workflows/build.yml`
 
 ### Trigger
+
 ```bash
 git tag -a v1.0.0 -m "Release v1.0.0"
 git push origin v1.0.0

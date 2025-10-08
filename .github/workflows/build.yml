@@ -2,12 +2,13 @@ name: Build and Release
 
 on:
   push:
-    tags:
-      - 'v*' # Trigger on version tags like v1.0.0, v0.1.0, etc.
+    branches:
+      - main # Trigger on push to main branch
   workflow_dispatch: # Allow manual triggering
 
 env:
   CARGO_TERM_COLOR: always
+  RELEASE_TAG: latest # Always use the same tag
 
 jobs:
   build:
@@ -37,6 +38,10 @@ jobs:
             target: aarch64-apple-darwin
             platform_suffix: macos-apple-silicon-aarch64
 
+    defaults:
+      run:
+        working-directory: tools/minecraft-installer
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -55,8 +60,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+            tools/minecraft-installer/target
+          key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('tools/minecraft-installer/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-${{ matrix.target }}-
 
@@ -118,15 +123,32 @@ jobs:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Delete existing release and tag
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Delete the release if it exists
+          gh release delete ${{ env.RELEASE_TAG }} --yes || true
+          
+          # Delete the tag if it exists
+          git push --delete origin ${{ env.RELEASE_TAG }} || true
+
+      - name: Create new tag
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git tag -f ${{ env.RELEASE_TAG }}
+          git push -f origin ${{ env.RELEASE_TAG }}
+
       - name: Get version from tag
         id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        run: echo "VERSION=${{ env.RELEASE_TAG }}" >> $GITHUB_OUTPUT
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -184,15 +206,21 @@ jobs:
       - name: Create release notes
         id: release_notes
         run: |
-          cat > release_notes.md << 'EOF'
-          # Minecraft Installer & Updater ${{ steps.get_version.outputs.VERSION }}
+          BUILD_DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          cat > release_notes.md << EOF
+          # Minecraft Installer & Updater - Latest Build
+
+          **🔄 Auto-updating Release** | Built: ${BUILD_DATE} | Commit: ${COMMIT_SHA}
+
+          This is an automatically updated release that always contains the **latest builds** from the main branch.
 
           ## 🎉 Dual-Executable Release
 
           This release includes **two separate executables** for all major platforms:
           
-          1. **`minecraft-installer`** - Install modpacks to launchers
-          2. **`minecraft-updater`** - Scan and update existing instances
+          1. **\`minecraft-installer\`** - Install modpacks to launchers
+          2. **\`minecraft-updater\`** - Scan and update existing instances
 
           ---
 
@@ -342,21 +370,25 @@ jobs:
 
           ---
 
-          **Full Changelog**: https://github.com/perlytiara/AstralRinth/compare/${{ github.event.before }}...${{ github.ref_name }}
+          **Repository**: https://github.com/perlytiara/NAHA-MC-Helper
+          
+          **Latest Commit**: ${COMMIT_SHA}
+          
+          ---
+          
+          > ⚠️ **Note**: This release is automatically rebuilt and updated on every push to main. Always download the latest version for the most recent features and fixes.
           EOF
 
-          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
-          cat release_notes.md >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          cat release_notes.md > $GITHUB_OUTPUT
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          token: ${{ secrets.GH_TOKEN }}
-          tag_name: ${{ github.ref_name }}
-          name: Minecraft Tools ${{ steps.get_version.outputs.VERSION }}
-          body: ${{ steps.release_notes.outputs.RELEASE_NOTES }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Minecraft Tools - Latest Build
+          body_path: release_notes.md
           files: |
             upload/*
           draft: false
-          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          prerelease: false
