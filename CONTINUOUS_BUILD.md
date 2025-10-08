@@ -254,6 +254,7 @@ const downloadUrl = 'https://github.com/perlytiara/NAHA-MC-Helper/releases/downl
 ## Summary
 
 The continuous build system provides:
+
 - 🔄 **Automatic builds** on every push
 - 📦 **Always up-to-date** binaries
 - 🔗 **Stable URLs** for downloads

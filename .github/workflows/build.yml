@@ -38,10 +38,6 @@ jobs:
             target: aarch64-apple-darwin
             platform_suffix: macos-apple-silicon-aarch64
 
-    defaults:
-      run:
-        working-directory: tools/minecraft-installer
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -60,8 +56,8 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            tools/minecraft-installer/target
-          key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('tools/minecraft-installer/Cargo.lock') }}
+            target
+          key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-${{ matrix.target }}-
 
